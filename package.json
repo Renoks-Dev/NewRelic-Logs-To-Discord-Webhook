@@ -1,0 +1,28 @@
+{
+  "name": "newrelic-discord-webhook",
+  "version": "1.0.0",
+  "description": "A Node.js script to fetch logs from New Relic and send them to a Discord webhook.",
+  "homepage": "https://github.com/Renoks-Dev/newrelic-discord-webhook#readme",
+  "bugs": {
+    "url": "https://github.com/Renoks-Dev/newrelic-discord-webhook/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Renoks-Dev/newrelic-discord-webhook.git"
+  },
+  "license": "ISC",
+  "author": "Renoks",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "production": "npm install && npm start"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

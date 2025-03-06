@@ -21,35 +21,45 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
   } else {
     embeds = logs.map((log) => ({
       title: `🚨 New Relic ${log.level.toUpperCase()} Log 🚨`,
-      description: `\`\`\`${log.message}\`\`\`` || "No message available.",
+      description: log.message
+        ? `\`\`\`${log.message}\`\`\``
+        : "No message available.",
       fields: [
         {
           name: "Hostname",
-          value: `\`\`\`${log.hostname}\`\`\`` || "Unknown",
+          value: log.hostname
+            ? `\`\`\`${log.hostname}\`\`\``
+            : `\`\`\`Unknown\`\`\``,
           inline: false,
         },
         {
           name: "Project Name",
-          value: `\`\`\`${log["entity.name"]}\`\`\`` || "Unknown",
+          value: log["entity.name"]
+            ? `\`\`\`${log["entity.name"]}\`\`\``
+            : `\`\`\`Unknown\`\`\``,
           inline: false,
         },
         {
           name: "Level",
-          value: `\`\`\`${log.level}\`\`\`` || "Unknown",
+          value: log.level ? `\`\`\`${log.level}\`\`\`` : `\`\`\`Unknown\`\`\``,
           inline: false,
         },
         {
           name: "Stack",
-          value: `\`\`\`${log.stack}\`\`\`` || "Unknown",
+          value: log.stack ? `\`\`\`${log.stack}\`\`\`` : `\`\`\`Unknown\`\`\``,
           inline: false,
         },
         {
           name: "Timestamp UTC",
-          value: `\`\`\`${log.original_timestamp}\`\`\`` || "Unknown",
+          value: log.original_timestamp
+            ? `\`\`\`${log.original_timestamp}\`\`\``
+            : `\`\`\`Unknown\`\`\``,
           inline: false,
         },
       ],
-      timestamp: new Date(log.timestamp).toISOString() || "Unknown",
+      timestamp: log.timestamp
+        ? new Date(log.timestamp).toISOString()
+        : `\`\`\`Unknown\`\`\``,
       color: log.level === "error" ? 16711680 : 16744448,
       footer: scheduledFetch
         ? { text: "🔁 Scheduled Execution 🔁" }

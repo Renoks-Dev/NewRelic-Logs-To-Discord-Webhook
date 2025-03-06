@@ -20,7 +20,7 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
     });
   } else {
     embeds = logs.map((log) => ({
-      title: "🚨 New Relic ERROR Log 🚨",
+      title: `🚨 New Relic ${log.level.toUpperCase()} Log 🚨`,
       description: `\`\`\`${log.message}\`\`\`` || "No message available.",
       fields: [
         {
@@ -50,7 +50,7 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
         },
       ],
       timestamp: new Date(log.timestamp).toISOString() || "Unknown",
-      color: 16711680,
+      color: log.level === "error" ? 16711680 : 16744448,
       footer: scheduledFetch
         ? { text: "🔁 Scheduled Execution 🔁" }
         : { text: "🚀 Immediate Execution 🚀" },

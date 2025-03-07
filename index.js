@@ -1,6 +1,9 @@
+const config = require("./config.json");
 const fetchNewRelicLogs = require("./src/fetchNewRelicLogs");
 const sendDiscordWebhook = require("./src/sendDiscordWebhook");
 const scheduledLogJob = require("./src/scheduledLogJob");
+
+const { CRON_SCHEDULE } = config;
 
 async function main() {
   console.log("Fetching logs from New Relic...");
@@ -11,8 +14,10 @@ async function main() {
 
   console.log("Immediate New Relic error log check completed.");
 
-  console.log("Scheduled the New Relic log job...");
-  scheduledLogJob();
+  if (CRON_SCHEDULE !== "") {
+    console.log("Scheduled the New Relic log job...");
+    scheduledLogJob();
+  }
 }
 
 main().catch(console.error);

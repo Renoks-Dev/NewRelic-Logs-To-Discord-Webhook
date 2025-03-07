@@ -14,7 +14,7 @@ This project provides a simple way to integrate New Relic logs with Discord, all
 
 ### Prerequisites
 - Node.js (version 20 or higher)
-- New Relic account with API key and NerdGraph query.
+- New Relic account with API key and NerdGraph query
 - Discord Webhook URL
 
 ### Setup
@@ -25,7 +25,8 @@ This project provides a simple way to integrate New Relic logs with Discord, all
 {
   "NEWRELIC_QUERY_KEY": "your_new_relic_api_key",
   "NEWRELIC_NERDGRAPH_QUERY": "your_new_relic_nerdgraph_query",
-  "DISCORD_WEBHOOK_URL": "your_discord_webhook_url"
+  "DISCORD_WEBHOOK_URL": "your_discord_webhook_url",
+  "CRON_SCHEDULE": "your_cron_job_schedule"
 }
 ```
 <br>
@@ -38,10 +39,12 @@ Replace the placeholders in the `config.json` file with your actual values.
 2. The script will fetch logs from New Relic and send them to the Discord webhook.
 
 ### Scheduling
-- To schedule the script to run at regular intervals you can modify the `scheduledLogJob.js` file to suit your scheduling needs. Currently set to run at `5pm UTC every day`.
+- To schedule the script to run at regular intervals you can modify the `CRON_SCHEDULE` in config.json to suit your scheduling needs.
+
+> [!NOTE]
+Use [crontab.guru](https://crontab.guru/) to find the right Cron Job schedule that works for you.
 
 ---
 <br>
 
-> [!NOTE]
-I hope this helps! Let me know if you have any questions or need further assistance.
+> I hope this helps! Let me know if you have any questions or need further assistance.

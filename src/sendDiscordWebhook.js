@@ -13,8 +13,8 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
     console.log("No error logs to send.");
 
     embeds.push({
-      title: "✅ No Error Logs",
-      description: "There are no error logs to report.",
+      title: "✅ Log Activity Not Found",
+      description: "No log entries are available at this time.",
       color: 3066993,
       timestamp: new Date().toISOString(),
     });

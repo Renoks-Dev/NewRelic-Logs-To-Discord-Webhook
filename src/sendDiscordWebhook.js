@@ -7,6 +7,13 @@ if (!DISCORD_WEBHOOK_URL) {
 }
 
 async function sendDiscordWebhook(logs, scheduledFetch = false) {
+  if (!Array.isArray(logs)) {
+    console.error(
+      "Logs object is not an array. Sending to discord webhook aborted."
+    );
+    return;
+  }
+
   let embeds = [];
 
   if (logs.length === 0) {
@@ -20,7 +27,7 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
     });
   } else {
     embeds = logs.map((log) => ({
-      title: `🚨 New Relic ${log.level.toUpperCase()} Log 🚨`,
+      title: `🚨 New Relic ${log.level?.toUpperCase() || "UNKNOWN"} Log 🚨`,
       description: log.message
         ? `\`\`\`${log.message}\`\`\``
         : "No message available.",

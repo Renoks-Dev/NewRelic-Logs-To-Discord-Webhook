@@ -16,7 +16,7 @@ async function sendWebhookBatch(embeds, webhookUrl) {
       console.error(
         `Failed to send Batch ${
           Math.floor(i / batchSize) + 1
-        } logs to Discord Webhook after ${maxRetries} retries.`
+        } logs to Discord Webhook after retries.`
       );
     } else {
       console.log(

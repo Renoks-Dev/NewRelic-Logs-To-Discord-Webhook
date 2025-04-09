@@ -26,6 +26,17 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
       timestamp: new Date().toISOString(),
     });
   } else {
+    // Sort the logs by timestamp ascending (oldest first, newest last)
+    logs.sort((a, b) => {
+      const timeA = new Date(
+        a.timestamp || a.original_timestamp || 0
+      ).getTime();
+      const timeB = new Date(
+        b.timestamp || b.original_timestamp || 0
+      ).getTime();
+      return timeA - timeB;
+    });
+
     embeds = logs.map((log) => ({
       title: `🚨 New Relic ${log.level?.toUpperCase() || "UNKNOWN"} Log 🚨`,
       description: log.message

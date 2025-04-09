@@ -40,68 +40,79 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
 
     if (validLogs.length === 0) {
       console.warn("No valid logs available after validation.");
-      return;
+
+      embeds.push({
+        title: "✅ Log Activity Not Found",
+        description: "No valid logs were found after validation.",
+        color: 3066993,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      console.log(`Total of ${validLogs.length} valid logs will be processed.`);
+
+      // Sort the valid logs by timestamp ascending (oldest first, newest last)
+      validLogs.sort((a, b) => {
+        const timeA = new Date(a.timestamp || a.original_timestamp).getTime();
+        const timeB = new Date(b.timestamp || b.original_timestamp).getTime();
+        return timeA - timeB;
+      });
+
+      embeds = validLogs.map((log) => ({
+        title: `🚨 New Relic ${log.level?.toUpperCase() || "UNKNOWN"} Log 🚨`,
+        description: log.message
+          ? `\`\`\`${log.message}\`\`\``
+          : "No message available.",
+        fields: [
+          {
+            name: "Hostname",
+            value: log.hostname
+              ? `\`\`\`${log.hostname}\`\`\``
+              : `\`\`\`Unknown\`\`\``,
+            inline: false,
+          },
+          {
+            name: "Project Name",
+            value: log["entity.name"]
+              ? `\`\`\`${log["entity.name"]}\`\`\``
+              : `\`\`\`Unknown\`\`\``,
+            inline: false,
+          },
+          {
+            name: "Level",
+            value: log.level
+              ? `\`\`\`${log.level}\`\`\``
+              : `\`\`\`Unknown\`\`\``,
+            inline: false,
+          },
+          {
+            name: "Stack",
+            value: log.stack
+              ? `\`\`\`${log.stack}\`\`\``
+              : `\`\`\`Unknown\`\`\``,
+            inline: false,
+          },
+          {
+            name: "Timestamp UTC",
+            value: log.original_timestamp
+              ? `\`\`\`${log.original_timestamp}\`\`\``
+              : `\`\`\`Unknown\`\`\``,
+            inline: false,
+          },
+        ],
+        ...(log.timestamp && {
+          timestamp: new Date(log.timestamp).toISOString(),
+        }),
+        color: log.level === "error" ? 16711680 : 16744448,
+        footer: scheduledFetch
+          ? { text: "🔁 Scheduled Execution 🔁" }
+          : { text: "🚀 Immediate Execution 🚀" },
+      }));
     }
-
-    console.log(`Total of ${validLogs.length} valid logs will be processed.`);
-
-    // Sort the valid logs by timestamp ascending (oldest first, newest last)
-    validLogs.sort((a, b) => {
-      const timeA = new Date(a.timestamp || a.original_timestamp).getTime();
-      const timeB = new Date(b.timestamp || b.original_timestamp).getTime();
-      return timeA - timeB;
-    });
-
-    embeds = validLogs.map((log) => ({
-      title: `🚨 New Relic ${log.level?.toUpperCase() || "UNKNOWN"} Log 🚨`,
-      description: log.message
-        ? `\`\`\`${log.message}\`\`\``
-        : "No message available.",
-      fields: [
-        {
-          name: "Hostname",
-          value: log.hostname
-            ? `\`\`\`${log.hostname}\`\`\``
-            : `\`\`\`Unknown\`\`\``,
-          inline: false,
-        },
-        {
-          name: "Project Name",
-          value: log["entity.name"]
-            ? `\`\`\`${log["entity.name"]}\`\`\``
-            : `\`\`\`Unknown\`\`\``,
-          inline: false,
-        },
-        {
-          name: "Level",
-          value: log.level ? `\`\`\`${log.level}\`\`\`` : `\`\`\`Unknown\`\`\``,
-          inline: false,
-        },
-        {
-          name: "Stack",
-          value: log.stack ? `\`\`\`${log.stack}\`\`\`` : `\`\`\`Unknown\`\`\``,
-          inline: false,
-        },
-        {
-          name: "Timestamp UTC",
-          value: log.original_timestamp
-            ? `\`\`\`${log.original_timestamp}\`\`\``
-            : `\`\`\`Unknown\`\`\``,
-          inline: false,
-        },
-      ],
-      ...(log.timestamp && {
-        timestamp: new Date(log.timestamp).toISOString(),
-      }),
-      color: log.level === "error" ? 16711680 : 16744448,
-      footer: scheduledFetch
-        ? { text: "🔁 Scheduled Execution 🔁" }
-        : { text: "🚀 Immediate Execution 🚀" },
-    }));
   }
 
   try {
-    const batchSize = 10; // Discord accepts maximum of 10 embeds per request
+    const batchSize = 10; // Discord accepts a maximum of 10 embeds per request
+    const totalBatches = Math.ceil(embeds.length / batchSize);
 
     for (let i = 0; i < embeds.length; i += batchSize) {
       const batch = embeds.slice(i, i + batchSize);
@@ -120,14 +131,14 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
 
       if (!response.ok) {
         console.error(
-          `Failed to send Batch ${i / batchSize + 1} logs to Discord: ${
-            response.statusText
-          }`
+          `Failed to send Batch ${
+            Math.floor(i / batchSize) + 1
+          } logs to Discord: ${response.statusText}`
         );
       } else {
         console.log(
           `Batch ${
-            i / batchSize + 1
+            Math.floor(i / batchSize) + 1
           } of logs sent to Discord Webhook successfully.`
         );
       }

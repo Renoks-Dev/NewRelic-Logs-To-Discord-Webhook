@@ -92,13 +92,13 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
             response.statusText
           }`
         );
+      } else {
+        console.log(
+          `Batch ${
+            i / batchSize + 1
+          } of logs sent to Discord Webhook successfully.`
+        );
       }
-
-      console.log(
-        `Batch ${
-          i / batchSize + 1
-        } of logs sent to Discord Webhook successfully.`
-      );
     }
   } catch (error) {
     console.error("Error sending logs to Discord:", error);

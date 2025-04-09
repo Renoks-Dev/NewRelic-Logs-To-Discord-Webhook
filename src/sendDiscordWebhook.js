@@ -57,9 +57,9 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
           inline: false,
         },
       ],
-      timestamp: log.timestamp
-        ? new Date(log.timestamp).toISOString()
-        : `\`\`\`Unknown\`\`\``,
+      ...(log.timestamp && {
+        timestamp: new Date(log.timestamp).toISOString(),
+      }),
       color: log.level === "error" ? 16711680 : 16744448,
       footer: scheduledFetch
         ? { text: "🔁 Scheduled Execution 🔁" }

@@ -75,17 +75,31 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
   }
 
   try {
-    const response = await fetch(DISCORD_WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ embeds }),
-    });
+    const batchSize = 10; // Discord accepts maximum of 10 embeds per request
 
-    if (!response.ok) {
-      throw new Error(`Failed to send logs to Discord: ${response.statusText}`);
+    for (let i = 0; i < embeds.length; i += batchSize) {
+      const batch = embeds.slice(i, i + batchSize);
+
+      const response = await fetch(DISCORD_WEBHOOK_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ embeds: batch }),
+      });
+
+      if (!response.ok) {
+        console.error(
+          `Failed to send Batch ${i / batchSize + 1} logs to Discord: ${
+            response.statusText
+          }`
+        );
+      }
+
+      console.log(
+        `Batch ${
+          i / batchSize + 1
+        } of logs sent to Discord Webhook successfully.`
+      );
     }
-
-    console.log("Logs sent to Discord successfully.");
   } catch (error) {
     console.error("Error sending logs to Discord:", error);
   }

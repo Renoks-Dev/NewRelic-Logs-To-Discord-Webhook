@@ -17,6 +17,8 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
 
   let embeds = [];
 
+  console.log(`Total of ${logs.length} logs will be processed.`);
+
   if (logs.length === 0) {
     console.log("No error logs to send.");
 

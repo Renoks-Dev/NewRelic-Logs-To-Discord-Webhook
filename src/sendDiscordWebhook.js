@@ -9,7 +9,7 @@ if (!DISCORD_WEBHOOK_URL) {
 async function sendDiscordWebhook(logs, scheduledFetch = false) {
   if (!Array.isArray(logs)) {
     console.error(
-      "Logs object is not an array. Sending to discord webhook aborted."
+      "Logs object is not an array. Sending to Discord webhook aborted."
     );
     return;
   }
@@ -26,18 +26,33 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
       timestamp: new Date().toISOString(),
     });
   } else {
-    // Sort the logs by timestamp ascending (oldest first, newest last)
-    logs.sort((a, b) => {
-      const timeA = new Date(
-        a.timestamp || a.original_timestamp || 0
-      ).getTime();
-      const timeB = new Date(
-        b.timestamp || b.original_timestamp || 0
-      ).getTime();
+    const validLogs = logs.filter((log, index) => {
+      const hasTimestamp = log.timestamp || log.original_timestamp;
+
+      if (!hasTimestamp) {
+        console.warn(
+          `Skipping log at index ${index} due to missing timestamp.`
+        );
+        return false;
+      }
+      return true;
+    });
+
+    if (validLogs.length === 0) {
+      console.warn("No valid logs available after validation.");
+      return;
+    }
+
+    console.log(`Total of ${validLogs.length} valid logs will be processed.`);
+
+    // Sort the valid logs by timestamp ascending (oldest first, newest last)
+    validLogs.sort((a, b) => {
+      const timeA = new Date(a.timestamp || a.original_timestamp).getTime();
+      const timeB = new Date(b.timestamp || b.original_timestamp).getTime();
       return timeA - timeB;
     });
 
-    embeds = logs.map((log) => ({
+    embeds = validLogs.map((log) => ({
       title: `🚨 New Relic ${log.level?.toUpperCase() || "UNKNOWN"} Log 🚨`,
       description: log.message
         ? `\`\`\`${log.message}\`\`\``
@@ -90,6 +105,12 @@ async function sendDiscordWebhook(logs, scheduledFetch = false) {
 
     for (let i = 0; i < embeds.length; i += batchSize) {
       const batch = embeds.slice(i, i + batchSize);
+
+      console.log(
+        `Sending batch ${Math.floor(i / batchSize) + 1}/${totalBatches} with ${
+          batch.length
+        } embeds.`
+      );
 
       const response = await fetch(DISCORD_WEBHOOK_URL, {
         method: "POST",
